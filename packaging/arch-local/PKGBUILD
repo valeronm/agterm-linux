@@ -1,0 +1,9 @@
+# Dependencies and package() come from the AUR PKGBUILD sourced here.
+source "$startdir/../aur/PKGBUILD"
+
+pkgname=agterm-linux-local
+pkgver="${AGTERM_LOCAL_PKGVER:?run scripts/install-linux-system.sh}"
+pkgrel=1
+conflicts=('agterm-linux' 'agterm-linux-bin')
+source=("agterm-linux-local.tar.gz" "LICENSE")
+sha256sums=('SKIP' 'SKIP')
