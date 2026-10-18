@@ -76,18 +76,30 @@ install -m644 "$DESKTOP" "$DEST/share/applications/io.github.melonamin.agterm.de
 install -m644 "$DESKTOP" "$DEST/io.github.melonamin.agterm.desktop"
 install -m755 "$ROOT/packaging/linux/install.sh" "$DEST/install.sh"
 
+# macOS rounds its icon at display time, while a Linux shell shows a PNG as drawn, so the asset is
+# masked here to the macOS corner radius and inset to the 104/128 body GNOME icons share.
 ICON_SRC="$(find "$ROOT/agterm/AppIcon.icon/Assets" -maxdepth 1 -type f -name '*.png' -print -quit)"
-if [[ -n "$ICON_SRC" ]]; then
+IMAGE_CONVERTER="$(command -v magick || command -v convert || true)"
+rounded_icon() {
+  local size="$1" out="$2"
+  local body=$(( (size * 104 + 64) / 128 )) radius
+  radius=$(( (body * 224 + 500) / 1000 ))
+  # -extent pads with the compose mode in force, so DstIn is reset before it.
+  "$IMAGE_CONVERTER" "$ICON_SRC" -resize "${body}x${body}!" -alpha set \
+    \( -size "${body}x${body}" xc:none -fill white \
+       -draw "roundrectangle 0,0,$((body - 1)),$((body - 1)),${radius},${radius}" \) \
+    -compose DstIn -composite -compose Over \
+    -background none -gravity center -extent "${size}x${size}" "$out"
+}
+if [[ -n "$ICON_SRC" && -n "$IMAGE_CONVERTER" ]]; then
+  rounded_icon 256 "$DEST/share/pixmaps/io.github.melonamin.agterm.png"
+  for size in 16 32 48 64 128 256 512; do
+    ICON_DIR="$DEST/share/icons/hicolor/${size}x${size}/apps"
+    mkdir -p "$ICON_DIR"
+    rounded_icon "$size" "$ICON_DIR/io.github.melonamin.agterm.png"
+  done
+elif [[ -n "$ICON_SRC" ]]; then
   install -m644 "$ICON_SRC" "$DEST/share/pixmaps/io.github.melonamin.agterm.png"
-  IMAGE_CONVERTER="$(command -v magick || command -v convert || true)"
-  if [[ -n "$IMAGE_CONVERTER" ]]; then
-    for size in 16 32 48 64 128 256 512; do
-      ICON_DIR="$DEST/share/icons/hicolor/${size}x${size}/apps"
-      mkdir -p "$ICON_DIR"
-      "$IMAGE_CONVERTER" "$ICON_SRC" -resize "${size}x${size}" \
-        "$ICON_DIR/io.github.melonamin.agterm.png"
-    done
-  fi
 fi
 
 cat > "$DEST/bin/agterm-linux" <<'LAUNCH'
