@@ -10,14 +10,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-SWIFT_HOME="$HOME/.local/share/mise/installs/swift/6.3.2"
-COMPAT="$HOME/.local/share/swift-linux-compat"
+# Locate the mise-managed Swift toolchain without hardcoding the install layout.
+SWIFT_HOME="$(mise where swift 2>/dev/null || echo "$HOME/.local/share/mise/installs/swift/6.3.2")"
 export PATH="$SWIFT_HOME/usr/bin:$PATH"
-# Arch ships wide ncurses + soname-bumped libxml2; the Ubuntu Swift toolchain
-# wants the older sonames. Bridge them (no sudo) for build + install.
-mkdir -p "$COMPAT"
-[ -e "$COMPAT/libncurses.so.6" ] || ln -sf /usr/lib/libncursesw.so.6 "$COMPAT/libncurses.so.6"
-[ -e "$COMPAT/libxml2.so.2" ]   || ln -sf "$(ls /usr/lib/libxml2.so.* | sort -V | tail -1)" "$COMPAT/libxml2.so.2"
+# Bridge libxml2.so.2 / libncurses.so.6 for the Ubuntu Swift toolchain (no sudo).
+# scripts/linux-swift-compat.sh discovers the real sonames and provisions the shim
+# (a no-op where the loader already has them); it's the same helper mise.toml sources.
+COMPAT="$(sh "$(dirname "$0")/linux-swift-compat.sh")"
 export LD_LIBRARY_PATH="$COMPAT${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
 BIN_DIR="$HOME/.local/bin"
