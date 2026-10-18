@@ -38,6 +38,9 @@ RPM="$OUT/agterm-linux-v${VERSION}-${HOST_ARCH}.rpm"
 
 tar czf "$TAR" -C "$WORK" agterm-linux
 
+# A DEB or RPM is owned by its package manager, so the tarball's installer stays out of them.
+rm "$PAYLOAD/install.sh"
+
 export AGTERM_PACKAGE_VERSION="$VERSION"
 export AGTERM_PACKAGE_ROOT="$PAYLOAD"
 export AGTERM_PACKAGE_ARCH="$PACKAGE_ARCH"

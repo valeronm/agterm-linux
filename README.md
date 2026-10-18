@@ -218,6 +218,17 @@ tar xzf agterm-linux-vX.Y.Z-x86_64.tar.gz
 ./agterm-linux/bin/agterm-linux
 ```
 
+The tarball also carries an installer for distributions without a DEB or RPM path, such as Arch.
+It places the payload under `/usr/local` (override with `PREFIX`), links `agterm-linux` and
+`agtermctl` into `bin`, registers the desktop entry and icons, and refuses to write anything while
+a host library is missing. Running it again from a newer tarball updates in place; open terminals
+keep the previous build until restarted.
+
+```sh
+sudo ./agterm-linux/install.sh
+sudo /usr/local/lib/agterm-linux/install.sh --uninstall
+```
+
 All artifacts are built for x86_64 on Ubuntu 24.04.
 Each release includes consolidated SHA-256 checksums and GitHub build-provenance attestations.
 
@@ -300,6 +311,7 @@ Local helper scripts:
 
 - `scripts/run-linux.sh` builds and runs the GTK app from the checkout.
 - `scripts/install-linux.sh` installs a personal build into `~/.local`.
+- `scripts/install-linux-system.sh` builds Release, stages the payload, and runs its installer under sudo.
 - `scripts/flatpak-linux.sh` builds and installs the local Flatpak manifest.
 - `scripts/test-linux-ui.sh` runs the GTK accessibility smoke suite locally under Xvfb (the same
   scenarios CI runs; works on dbus-broker hosts — the script pre-starts the AT-SPI registry).

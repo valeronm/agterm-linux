@@ -74,6 +74,7 @@ DESKTOP="$ROOT/packaging/linux/io.github.melonamin.agterm.desktop"
 install -m644 "$DESKTOP" "$DEST/share/applications/io.github.melonamin.agterm.desktop"
 # Keep the historical root copy consumed by the local Flatpak manifest and convenient for tar users.
 install -m644 "$DESKTOP" "$DEST/io.github.melonamin.agterm.desktop"
+install -m755 "$ROOT/packaging/linux/install.sh" "$DEST/install.sh"
 
 ICON_SRC="$(find "$ROOT/agterm/AppIcon.icon/Assets" -maxdepth 1 -type f -name '*.png' -print -quit)"
 if [[ -n "$ICON_SRC" ]]; then
