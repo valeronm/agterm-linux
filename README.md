@@ -403,6 +403,8 @@ Local helper scripts:
 
 - `scripts/run-linux.sh` builds and runs the GTK app from the checkout.
 - `scripts/install-linux.sh` installs a personal build into `~/.local`.
+- `scripts/install-linux-system.sh` builds Release and installs it on Arch as the `agterm-linux-local`
+  pacman package, through `packaging/arch-local`.
 - `scripts/flatpak-linux.sh` builds and installs the local Flatpak manifest.
 - `scripts/test-linux-ui.sh` runs the GTK accessibility smoke suite locally under Xvfb (the same
   scenarios CI runs; works on dbus-broker hosts — the script pre-starts the AT-SPI registry).
