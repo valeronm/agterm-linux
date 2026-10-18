@@ -10,13 +10,10 @@ cd "$ROOT"
 
 command -v flatpak-builder >/dev/null || { echo "flatpak-builder not found — install it first" >&2; exit 1; }
 
-# The mise Swift toolchain + the Arch ncurses/libxml2 compat shims (mirrors run-linux.sh) for the build.
-SWIFT_HOME="$HOME/.local/share/mise/installs/swift/6.3.2"
-COMPAT="$HOME/.local/share/swift-linux-compat"
+# The mise Swift toolchain + the soname compat shim (the same helper run-linux.sh and mise.toml use).
+SWIFT_HOME="$(mise where swift 2>/dev/null || echo "$HOME/.local/share/mise/installs/swift/6.3.2")"
 export PATH="$SWIFT_HOME/usr/bin:$PATH"
-mkdir -p "$COMPAT"
-[ -e "$COMPAT/libncurses.so.6" ] || ln -sf /usr/lib/libncursesw.so.6 "$COMPAT/libncurses.so.6"
-[ -e "$COMPAT/libxml2.so.2" ]   || ln -sf "$(ls /usr/lib/libxml2.so.* | sort -V | tail -1)" "$COMPAT/libxml2.so.2"
+COMPAT="$(sh "$ROOT/scripts/linux-swift-compat.sh")"
 export LD_LIBRARY_PATH="$COMPAT${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
 echo "==> libghostty (idempotent; targets glibc 2.39 so the .so runs in the flatpak runtime)"

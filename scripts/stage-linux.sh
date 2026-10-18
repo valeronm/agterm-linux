@@ -43,11 +43,17 @@ install -m755 "$CTL" "$DEST/bin/agtermctl.bin"
 install -m755 "$APP/vendor/zmx/zmx" "$DEST/bin/zmx"
 cp -R "$APP_RESOURCES" "$DEST/bin/"
 
+# The Swift runtime resolves libxml2.so.2 / libncurses.so.6 through the compat shim on hosts missing
+# those sonames; without it on LD_LIBRARY_PATH, ldd reports them "not found" and the bundler below
+# would silently drop them from the "self-contained" payload.
+COMPAT="$(sh "$ROOT/scripts/linux-swift-compat.sh")"
+export LD_LIBRARY_PATH="$COMPAT${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
 # Bundle the non-system libraries that make the Swift app portable. GTK, libadwaita, and glibc remain
 # host dependencies in tar/DEB/RPM.
 { ldd "$BIN"; ldd "$CTL"; } \
   | awk '/=> \// {print $3}' \
-  | grep -E '/(swift|ghostty)|libghostty|swift-linux-compat' \
+  | grep -E '/(swift|ghostty)|libghostty' \
   | sort -u \
   | while read -r lib; do
       [[ -f "$lib" ]] && cp -L "$lib" "$DEST/lib/"
