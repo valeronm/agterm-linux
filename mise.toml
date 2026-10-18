@@ -1,0 +1,14 @@
+# Project-scoped toolchain for agterm's Linux build (agtermCore + the agterm-linux GTK port).
+# swift/zig are pinned to match CI's `swift:6.3.2` container and the GHOSTTY_REV zig (0.16.0).
+[tools]
+swift = "6.3.2"
+zig = "0.16.0"
+
+[env]
+# Machine-independent libxml2/libncurses shim for the Ubuntu-built Swift toolchain.
+# scripts/linux-swift-compat.sh discovers the real sonames for THIS host's arch and
+# provisions symlinks under ~/.cache/agterm/swift-compat (a no-op where the loader
+# already resolves them — stock Ubuntu 24.04, the CI container), printing the dir we
+# add to LD_LIBRARY_PATH. The same helper backs scripts/run-linux.sh, so bare
+# `swift build`/`swift test` and the app launcher share one shim.
+LD_LIBRARY_PATH = "{{ exec(command='sh ' ~ config_root ~ '/scripts/linux-swift-compat.sh') }}"
