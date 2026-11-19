@@ -3,6 +3,7 @@
 [tools]
 swift = "6.3.2"
 zig = ["0.16.0", "0.17.0"]
+nfpm = "2.47.0"
 
 [env]
 # Machine-independent libxml2/libncurses shim for the Ubuntu-built Swift toolchain.
